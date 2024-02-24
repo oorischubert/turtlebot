@@ -1,40 +1,49 @@
-import os
-import launch
+from launch import LaunchDescription
+from launch.actions import IncludeLaunchDescription, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.actions import IncludeLaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
+import os
 
 def generate_launch_description():
-    motor_controller = Node(
-            package='turtlebot',
-            executable='motor_controller',
-            name='motor_controller'
+    rplidar_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            os.path.join(get_package_share_directory('rplidar_ros'), 'launch', 'rplidar_a2m8_launch.py')
+        ]),
+        launch_arguments={
+            'scan_mode': 'Boost',
+            'frame_id': 'base_link'
+        }.items()
     )
 
-    rplidar_launch = IncludeLaunchDescription(
-    PythonLaunchDescriptionSource(
-        os.path.join(get_package_share_directory('rplidar_ros'), 'launch', 'rplidar_a2m8_launch.py')
-    ),
-    launch_arguments={
-        'scan_mode': 'Boost',
-        'frame_id': 'base_link'  # Set the frame_id for the RPLIDAR
-    }.items()
-)
+    delayed_rplidar_launch = TimerAction(
+        period=2.0,  # Delay in seconds before starting the RPLIDAR
+        actions=[rplidar_launch]
+    )
 
     static_tf_broadcaster = Node(
-    package='tf2_ros',
-    executable='static_transform_publisher',
-    arguments=['0', '0', '0', '0', '0', '0', 'map', 'base_link'],  # Adjust these values as needed
-    name='static_tf_broadcaster'
-)
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'map', 'base_link'],
+        name='static_tf_broadcaster'
+    )
 
+    motor_controller = Node(
+        package='turtlebot',
+        executable='motor_controller',
+        name='motor_controller'
+    )
 
-    return launch.LaunchDescription([
+    return LaunchDescription([
         static_tf_broadcaster,
+        delayed_rplidar_launch,  # Use the delayed action for RPLIDAR
         motor_controller,
-        rplidar_launch,
     ])
+
+
+    #turtlebot:
+    #git clone https://github.com/oorischubert/turtlebot
+    #ros2 launch turtlebot turtlebot_launch.py
 
     #rplidar: 
     #git clone -b ros2 https://github.com/Slamtec/rplidar_ros.git
@@ -46,7 +55,7 @@ def generate_launch_description():
 
     # usb port connections:
     # |------------------|
-    # | rplidar | esp32  |
+    # | empty  |  esp32  |
     # |------------------|
-    # | empty   | empty  |
+    # | Bootfs | rplidar |
     # |------------------|
