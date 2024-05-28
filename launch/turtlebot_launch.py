@@ -42,13 +42,16 @@ def generate_launch_description():
 
 
     #turtlebot:
+    #apt-get install -y python3-pip
     #git clone https://github.com/oorischubert/turtlebot
+    #source install/setup.bash
     #ros2 launch turtlebot turtlebot_launch.py
+    #ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p key_timeout:=0.1 -r cmd_vel:=/your_custom_topic
 
     #rplidar: 
     #git clone -b ros2 https://github.com/Slamtec/rplidar_ros.git
     #ros2 launch rplidar_ros rplidar_a2m8_launch.py frame_id:=base_link
-    
+
     #base_link: 
     #sudo apt install ros-humble-tf2-ros
     #ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 map base_link

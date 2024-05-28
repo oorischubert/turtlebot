@@ -15,7 +15,7 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='oorischubert',
-    maintainer_email='oorischubert@gmail.com',
+    maintaiemail='oorischubert@gmail.com',
     description='my first robot',
     license='Apache-2.0',
     tests_require=['pytest'],
