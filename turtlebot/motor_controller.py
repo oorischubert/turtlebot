@@ -28,7 +28,7 @@ class DiffDriveController(Node):
     def listener_callback(self, msg):
     
         #Send these velocities to the motors:
-        self.esp.esp.send_velocity_command(msg.linear.x, msg.angular.z)
+        self.esp.send_velocity_command(msg.linear.x, msg.angular.z)
         self.esp.read_serial_data(self.motorMessage)
 
         self.get_logger().info(f"Linear Vel: {self.motorMessage.velocity_x}, Requested: {msg.linear.x}")
