@@ -1,9 +1,20 @@
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, TimerAction
+from launch.actions import IncludeLaunchDescription, TimerAction, RegisterEventHandler, EmitEvent, LogInfo, OpaqueFunction 
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
+from launch.event_handlers import OnProcessExit, OnShutdown
+from launch.events import Shutdown
 import os
+import subprocess
+
+def exit_process_function(_launch_context):
+    #not working yet!
+    cmd = [
+        'ros2', 'topic', 'pub', '-t', '1', '/cmd_vel', 'geometry_msgs/msg/Twist',
+        '{linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}'
+    ]
+    subprocess.run(cmd, shell=True)
 
 def generate_launch_description():
     rplidar_launch = IncludeLaunchDescription(
@@ -34,10 +45,24 @@ def generate_launch_description():
         name='motor_controller'
     )
 
+    on_motor_controller_exit = RegisterEventHandler(
+        OnProcessExit(
+            target_action=motor_controller,
+            on_exit=[
+                LogInfo(msg="Motor shutdown initiated..."),
+                EmitEvent(event=Shutdown(reason='Motor controller exited')),
+                OpaqueFunction(
+                        function=exit_process_function
+                    ),
+            ]
+        )
+    )
+
     return LaunchDescription([
         static_tf_broadcaster,
         delayed_rplidar_launch,  # Use the delayed action for RPLIDAR
         motor_controller,
+        on_motor_controller_exit
     ])
 
 

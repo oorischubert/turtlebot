@@ -24,7 +24,7 @@ class MotorMessage:
 
 class MotorController:
     def __init__(self,port):
-        self.port = '/dev/tty.usbserial-022EE911' #port to connect to
+        self.port = port
 
     def initHandshake(self):
         try:
@@ -100,6 +100,7 @@ def main():
                     print(f"Angular Vel: {motorMessage.velocity_angular}\n")
                     time.sleep(0.1)
     except KeyboardInterrupt:
+        esp.shutdown()
         print("Program stopped by user")
     finally:
         esp.shutdown()

@@ -1,6 +1,6 @@
 import rclpy
 from turtlebot.motorComms import MotorController, MotorMessage
-import configuration as config
+from .configuration import *
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 
@@ -9,7 +9,7 @@ class DiffDriveController(Node):
     def __init__(self):
         super().__init__('motor_controller')
         #esp comms init 
-        self.esp = MotorController(config.ESP_SERIAL_PORT)
+        self.esp = MotorController(ESP_SERIAL_PORT)
         self.motorMessage = MotorMessage()
 
         connectBool = self.esp.initHandshake()
