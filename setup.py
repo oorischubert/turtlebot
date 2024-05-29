@@ -22,6 +22,7 @@ setup(
     entry_points={
         'console_scripts': [
             'motor_controller = turtlebot.motor_controller:main',
+            'teleop = turtlebot.teleop:main',
         ],
     },
 )

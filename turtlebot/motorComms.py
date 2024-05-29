@@ -35,8 +35,11 @@ class MotorController:
             return False
         
     def shutdown(self):
-        self.send_velocity_command(0, 0)
-        self.serial.close()
+        if self.serial.is_open:
+            self.send_velocity_command(0, 0)
+            self.serial.close()
+        else:
+            print("[motorComms] Error closing serial port!")
 
     def calculate_receive_checksum(self,data):
         """Calculate checksum for received data."""
@@ -60,6 +63,7 @@ class MotorController:
         data[SIZE_OF_RX_DATA - 2] = checksum
         data[SIZE_OF_RX_DATA - 1] = TAIL
         self.serial.write(data)
+        self.serial.flush() #flush data stream
 
     def read_serial_data(self,motorMessage):
         """Read data from serial and process it."""
@@ -76,13 +80,13 @@ class MotorController:
                     motorMessage.velocity_y = unpacked_data[4]
                     motorMessage.velocity_angular = unpacked_data[5]
                 else:
-                    print("Checksum mismatch")
+                    print("[motorComms] Checksum mismatch")
             else:
-                print("Header mismatch")
+                print("[motorComms] Header mismatch")
 
 def main():
     """Main function to control omni-wheel car."""
-    esp = MotorController('/dev/tty.usbserial-022EE911')
+    esp = MotorController(SERIAL_PORT)
     motorMessage = MotorMessage()
     connect_bool = esp.initHandshake()
     if not connect_bool: 
@@ -91,14 +95,19 @@ def main():
         print("Serial port opened successfully!")
     try:
         while True:
-            for i in range(10):
-                start_time = time.time()
-                while time.time() - start_time < 10:
-                    esp.send_velocity_command(i * 0.05, 0)
-                    esp.read_serial_data(motorMessage)
-                    print(f"Linear Vel: {motorMessage.velocity_x}")
-                    print(f"Angular Vel: {motorMessage.velocity_angular}\n")
-                    time.sleep(0.1)
+            speed = float(input("Enter speed: "))
+            esp.send_velocity_command(speed, 0)
+            esp.read_serial_data(motorMessage)
+            print(f"Linear Vel: {motorMessage.velocity_x}")
+            print(f"Angular Vel: {motorMessage.velocity_angular}\n")
+            # for i in range(10):
+            #     start_time = time.time()
+            #     while time.time() - start_time < 10:
+            #         esp.send_velocity_command(i * 0.05, 0)
+            #         esp.read_serial_data(motorMessage)
+            #         print(f"Linear Vel: {motorMessage.velocity_x}")
+            #         print(f"Angular Vel: {motorMessage.velocity_angular}\n")
+            #         time.sleep(0.1)
     except KeyboardInterrupt:
         esp.shutdown()
         print("Program stopped by user")
