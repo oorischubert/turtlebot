@@ -1,6 +1,7 @@
 import serial
 import time
 import struct
+from serial.tools import list_ports
 
 # Constants for communication protocol
 HEADER = 200
@@ -23,16 +24,24 @@ class MotorMessage:
         self.velocity_angular = 0
 
 class MotorController:
-    def __init__(self,port):
-        self.port = port
+    # def __init__(self):
+    #     self.port
 
-    def initHandshake(self):
+    def initHandshake(self,port=""):
         try:
+            if port=="":
+                self.port=self.scan_devices()[1]
             self.serial = serial.Serial(self.port, BAUD_RATE, timeout=TIMEOUT)
             return True
         except Exception as e:
-            #print("Error opening serial port: ", e)
+            print("Error opening serial port: ", e)
             return False
+        
+    @staticmethod
+    def scan_devices():
+        """Scan for available ports."""
+        ports = list_ports.comports()
+        return [port.device for port in ports]
         
     def shutdown(self):
         if self.serial.is_open:
@@ -86,13 +95,14 @@ class MotorController:
 
 def main():
     """Main function to control omni-wheel car."""
-    esp = MotorController(SERIAL_PORT)
+    esp = MotorController()
     motorMessage = MotorMessage()
     connect_bool = esp.initHandshake()
     if not connect_bool: 
         print("Error opening serial port!")
     else: 
         print("Serial port opened successfully!")
+    print(f"Using port: {esp.port}")
     try:
         while True:
             speed = float(input("Enter speed: "))

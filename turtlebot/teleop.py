@@ -8,17 +8,18 @@ import tty
 class CustomTeleop(Node):
 
     def __init__(self):
-        super().__init__('custom_teleop')
+        super().__init__('turtlebot_teleop')
         self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
         self.linear_speed = 0.0
         self.angular_speed = 0.0
-        self.speed_increment = 0.025
+        self.speed_increment_lin = 0.025
+        self.speed_increment_ang = 0.01
         self.print_instructions()
-        self.get_logger().info('Custom Teleop Node Started. Use WASD keys to control the robot.')
+        self.get_logger().info('Teleop Node Started. Use WASD keys to control the robot.')
 
     def print_instructions(self):
         print("""
-Control Your Robot!
+Control TurtleBot!
 ---------------------------
 Moving around:
    w    
@@ -48,20 +49,20 @@ CTRL-C to quit
             while rclpy.ok():
                 key = self.get_key()
                 if key == 'w':
-                    self.linear_speed = min(1.0, self.linear_speed + self.speed_increment)
+                    self.linear_speed = min(1.0, self.linear_speed + self.speed_increment_lin)
                     twist.linear.x = self.linear_speed
-                    twist.angular.z = 0.0
+                    #twist.angular.z = 0.0
                 elif key == 's':
-                    self.linear_speed = max(-1.0, self.linear_speed - self.speed_increment)
+                    self.linear_speed = max(-1.0, self.linear_speed - self.speed_increment_lin)
                     twist.linear.x = self.linear_speed
-                    twist.angular.z = 0.0
+                    #twist.angular.z = 0.0
                 elif key == 'a':
-                    self.angular_speed = min(1.0, self.angular_speed + self.speed_increment)
-                    twist.linear.x = 0.0
+                    self.angular_speed = min(1.0, self.angular_speed + self.speed_increment_ang)
+                    #twist.linear.x = 0.0
                     twist.angular.z = self.angular_speed
                 elif key == 'd':
-                    self.angular_speed = max(-1.0, self.angular_speed - self.speed_increment)
-                    twist.linear.x = 0.0
+                    self.angular_speed = max(-1.0, self.angular_speed - self.speed_increment_ang)
+                    #twist.linear.x = 0.0
                     twist.angular.z = self.angular_speed
                 elif key == 'x':
                     self.linear_speed = 0.0
@@ -71,18 +72,18 @@ CTRL-C to quit
                 elif key == 'i':
                     self.linear_speed = abs(self.linear_speed)
                     twist.linear.x = self.linear_speed
-                    twist.angular.z = 0.0
+                    #twist.angular.z = 0.0
                 elif key == 'k':
                     self.linear_speed = -abs(self.linear_speed)
                     twist.linear.x = self.linear_speed
-                    twist.angular.z = 0.0
+                    #twist.angular.z = 0.0
                 elif key == 'j':
                     self.angular_speed = abs(self.angular_speed)
-                    twist.linear.x = 0.0
+                    #twist.linear.x = 0.0
                     twist.angular.z = self.angular_speed
                 elif key == 'l':
                     self.angular_speed = -abs(self.angular_speed)
-                    twist.linear.x = 0.0
+                    #twist.linear.x = 0.0
                     twist.angular.z = self.angular_speed
                 elif key == 'q' or key == '\x03':  # CTRL-C to quit
                     break

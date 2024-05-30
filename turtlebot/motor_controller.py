@@ -12,25 +12,24 @@ class DiffDriveController(Node):
     def __init__(self):
         super().__init__('motor_controller')
         # esp comms init 
-        self.esp = MotorController(ESP_SERIAL_PORT)
+        self.esp = MotorController()
         self.motorMessage = MotorMessage()
 
         connectBool = self.esp.initHandshake()
         if not connectBool: 
             self.get_logger().info("Error opening serial port!")
         else: 
-            self.get_logger().info("Serial port opened successfully!")
+            self.get_logger().info(f"Using serial port: {self.esp.port}")
             
         self.subscription = self.create_subscription(
             Twist,
             'cmd_vel',
             self.listener_callback,
-            10  # Increased queue size
+            10  #message que size
         )
 
     def listener_callback(self, msg):
         start_time = time.time()
-        # Send these velocities to the motors:
         try:
             self.esp.send_velocity_command(float(msg.linear.x), float(msg.angular.z))
             self.esp.read_serial_data(self.motorMessage)

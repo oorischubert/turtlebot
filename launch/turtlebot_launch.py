@@ -28,7 +28,7 @@ def generate_launch_description():
     )
 
     delayed_rplidar_launch = TimerAction(
-        period=2.0,  # Delay in seconds before starting the RPLIDAR
+        period=2.0,  # Delay in seconds before starting the RPLIDAR to prevent startup interference from other processes
         actions=[rplidar_launch]
     )
 
@@ -71,7 +71,9 @@ def generate_launch_description():
     #git clone https://github.com/oorischubert/turtlebot
     #source install/setup.bash
     #ros2 launch turtlebot turtlebot_launch.py
-    #ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p key_timeout:=0.1 -r cmd_vel:=/your_custom_topic
+   
+    #local keyboard teleop
+    #ros2 run turtlebot teleop
 
     #rplidar: 
     #git clone -b ros2 https://github.com/Slamtec/rplidar_ros.git
