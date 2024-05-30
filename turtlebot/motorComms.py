@@ -30,7 +30,7 @@ class MotorController:
     def initHandshake(self,port=""):
         try:
             if port=="":
-                self.port=self.scan_devices()[1]
+                self.port=self.scan_devices()[0]
             self.serial = serial.Serial(self.port, BAUD_RATE, timeout=TIMEOUT)
             return True
         except Exception as e:

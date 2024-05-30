@@ -68,6 +68,7 @@ def generate_launch_description():
 
     #turtlebot:
     #apt-get install -y python3-pip
+    #pip3 install pyserial
     #git clone https://github.com/oorischubert/turtlebot
     #source install/setup.bash
     #ros2 launch turtlebot turtlebot_launch.py
@@ -83,9 +84,17 @@ def generate_launch_description():
     #sudo apt install ros-humble-tf2-ros
     #ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 map base_link
 
-    # usb port connections:
+    # rpi4 usb port connections:
     # |------------------|
-    # | empty  |  esp32  |
+    # | esp32  | rplidar |
     # |------------------|
-    # | Bootfs | rplidar |
+    # | empty  |  empty  |
     # |------------------|
+
+    # rpi5 usb port connections:
+    # |------------------|
+    # | rplidar | esp32  |
+    # |------------------|
+    # | Bootfs  | empty  |
+    # |------------------|
+
