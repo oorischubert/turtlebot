@@ -32,12 +32,13 @@ def generate_launch_description():
         actions=[rplidar_launch]
     )
 
-    static_tf_broadcaster = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        arguments=['0', '0', '0', '0', '0', '0', 'map', 'base_link'],
-        name='static_tf_broadcaster'
-    )
+    #deprecates as i now have odometry data from motor controller
+    # static_tf_broadcaster = Node(
+    #     package='tf2_ros',
+    #     executable='static_transform_publisher',
+    #     arguments=['0', '0', '0', '0', '0', '0', 'map', 'base_link'],
+    #     name='static_tf_broadcaster'
+    # )
 
     motor_controller = Node(
         package='turtlebot',
@@ -59,7 +60,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        static_tf_broadcaster,
+        #static_tf_broadcaster,
         delayed_rplidar_launch,  # Use the delayed action for RPLIDAR
         motor_controller,
         on_motor_controller_exit
@@ -69,6 +70,7 @@ def generate_launch_description():
     #turtlebot:
     #apt-get install -y python3-pip
     #pip3 install pyserial
+    #pip3 install tf-transformations
     #git clone https://github.com/oorischubert/turtlebot
     #source install/setup.bash
     #ros2 launch turtlebot turtlebot_launch.py
