@@ -70,7 +70,7 @@ def generate_launch_description():
     #turtlebot:
     #apt-get install -y python3-pip
     #pip3 install pyserial
-    #pip3 install tf-transformations
+    #pip3 install transforms3d
     #git clone https://github.com/oorischubert/turtlebot
     #source install/setup.bash
     #ros2 launch turtlebot turtlebot_launch.py
