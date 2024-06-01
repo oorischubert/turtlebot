@@ -2,17 +2,7 @@ import serial
 import time
 import struct
 from serial.tools import list_ports
-
-# Constants for communication protocol
-HEADER = 200
-TAIL = 199
-SIZE_OF_RX_DATA = 17
-VELOCITY_MODE = 1  
-
-# Serial port configuration
-SERIAL_PORT = '/dev/tty.usbserial-022EE911' #not always the same!
-BAUD_RATE = 115200
-TIMEOUT = 1
+from turtlebot.configuration import *
 
 class MotorMessage:
     def __init__(self):
@@ -66,7 +56,7 @@ class MotorController:
 
         # Packing velocity into 4 bytes
         data[3:7] = struct.pack('f', velocity_x)  # velocity x
-        # data[7:11] = velocity_bytes # velocity y //not neccesary for diff-drive
+        # data[7:11] = velocity_bytes # velocity y (not neccesary for diff-drive)
         data[11:15] = struct.pack('f', velocity_angular) #velocity angular z
         checksum = self.calculate_transmit_checksum(data)
         data[SIZE_OF_RX_DATA - 2] = checksum
@@ -99,17 +89,17 @@ def main():
     motorMessage = MotorMessage()
     connect_bool = esp.initHandshake()
     if not connect_bool: 
-        print("Error opening serial port!")
+        print("[motorComms] Error opening serial port!")
     else: 
-        print("Serial port opened successfully!")
-    print(f"Using port: {esp.port}")
+        print("[motorComms] Serial port opened successfully!")
+    print(f"[motorComms] Using port: {esp.port}")
     try:
         while True:
             speed = float(input("Enter speed: "))
             esp.send_velocity_command(speed, 0)
             esp.read_serial_data(motorMessage)
-            print(f"Linear Vel: {motorMessage.velocity_x}")
-            print(f"Angular Vel: {motorMessage.velocity_angular}\n")
+            print(f"[motorComms] Linear Vel: {motorMessage.velocity_x}")
+            print(f"[motorComms] Angular Vel: {motorMessage.velocity_angular}\n")
             # for i in range(10):
             #     start_time = time.time()
             #     while time.time() - start_time < 10:
@@ -120,7 +110,7 @@ def main():
             #         time.sleep(0.1)
     except KeyboardInterrupt:
         esp.shutdown()
-        print("Program stopped by user")
+        print("[motorComms] Program stopped by user")
     finally:
         esp.shutdown()
 
