@@ -30,20 +30,20 @@
 <link name="wheel_2">
   <inertial>
     <origin xyz="0.06888830561351354 -0.023235974830111583 0.023835792094402966" rpy="0 0 0"/>
-    <mass value="0.16015634167325105"/>
-    <inertia ixx="0.000401" iyy="0.000401" izz="0.00007207" ixy="0.0" iyz="0.0" ixz="0.0"/>
+    <mass value="0.03203126833465021"/>
+    <inertia ixx="1.4e-05" iyy="2.4e-05" izz="1.4e-05" ixy="-0.0" iyz="0.0" ixz="0.0"/>
   </inertial>
   <visual>
     <origin xyz="0.06353 0.0615 -0.034204" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find turtlebot)/meshes/wheel_2.stl" scale="0.001 0.001 0.05"/>
+      <mesh filename="file://$(find turtlebot)/meshes/wheel_2.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="blue"/>
   </visual>
   <collision>
     <origin xyz="0.06353 0.0615 -0.034204" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find turtlebot)/meshes/wheel_2.stl" scale="0.001 0.001 0.05"/>
+      <mesh filename="file://$(find turtlebot)/meshes/wheel_2.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
@@ -51,20 +51,20 @@
 <link name="wheel_1">
   <inertial>
     <origin xyz="3.056135131906945e-07 0.01829722739215528 -1.1901500950733945e-07" rpy="0 0 0"/>
-    <mass value="0.16015634167325105"/>
-    <inertia ixx="0.000401" iyy="0.000401" izz="0.00007207" ixy="0.0" iyz="0.0" ixz="0.0"/>
+    <mass value="0.03203126833465021"/>
+    <inertia ixx="1.4e-05" iyy="2.4e-05" izz="1.4e-05" ixy="0.0" iyz="0.0" ixz="-0.0"/>
   </inertial>
   <visual>
     <origin xyz="0.06353 -0.065361 -0.034204" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find turtlebot)/meshes/wheel_1.stl" scale="0.001 0.001 0.05"/>
+      <mesh filename="file://$(find turtlebot)/meshes/wheel_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="blue"/>
   </visual>
   <collision>
     <origin xyz="0.06353 -0.065361 -0.034204" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find turtlebot)/meshes/wheel_1.stl" scale="0.001 0.001 0.05"/>
+      <mesh filename="file://$(find turtlebot)/meshes/wheel_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
