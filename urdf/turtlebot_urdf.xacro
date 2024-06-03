@@ -45,20 +45,6 @@
     <geometry>
       <mesh filename="file://$(find turtlebot)/meshes/wheel_2.stl" scale="0.001 0.001 0.05"/>
     </geometry>
-    <surface>
-      <friction>
-        <ode>
-          <mu>1.0</mu>
-          <mu2>1.0</mu2>
-        </ode>
-      </friction>
-      <contact>
-        <ode>
-          <kp>100000</kp>
-          <kd>1</kd>
-        </ode>
-      </contact>
-    </surface>
   </collision>
 </link>
 
@@ -80,20 +66,6 @@
     <geometry>
       <mesh filename="file://$(find turtlebot)/meshes/wheel_1.stl" scale="0.001 0.001 0.05"/>
     </geometry>
-    <surface>
-      <friction>
-        <ode>
-          <mu>1.0</mu>
-          <mu2>1.0</mu2>
-        </ode>
-      </friction>
-      <contact>
-        <ode>
-          <kp>100000</kp>
-          <kd>1</kd>
-        </ode>
-      </contact>
-    </surface>
   </collision>
 </link>
 
