@@ -54,7 +54,7 @@ class DiffDriveController(Node):
         odom.header.frame_id = 'odom'
         odom.child_frame_id = 'base_link'
         # Set position
-        odom.pose.pose.position = Point(x=self.motorMessage.position_x, y=self.motorMessage.position_y, z=0)
+        odom.pose.pose.position = Point(x=self.motorMessage.position_x, y=self.motorMessage.position_y, z=0.0)
         # Convert Euler angles to quaternion and set orientation
         quaternion = transforms3d.euler.euler2quat(0, 0, self.motorMessage.position_angular)
         odom.pose.pose.orientation = Quaternion(x=quaternion[1], y=quaternion[2], z=quaternion[3], w=quaternion[0])
