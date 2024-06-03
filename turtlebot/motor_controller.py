@@ -22,7 +22,7 @@ class DiffDriveController(Node):
             self.get_logger().info("Error opening serial port!")
         else: 
             self.get_logger().info(f"Using serial port: {self.esp.port}")
-            
+        self.esp.send_velocity_command(0.0,0.0)
         self.subscription = self.create_subscription(
             Twist,
             'cmd_vel',

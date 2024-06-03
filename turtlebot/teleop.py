@@ -70,11 +70,13 @@ CTRL-C to quit
                 elif key == 'q' or key == '\x03':  # CTRL-C to quit
                     break
 
-                # Update twist message
-                twist.linear.x = self.linear_speed
-                twist.angular.z = self.angular_speed
-
-                self.publisher_.publish(twist)
+                # Update twist message if new
+                if (twist.linear.x != self.linear_speed or twist.angular.z != self.angular_speed): 
+                    twist.linear.x = self.linear_speed
+                    twist.angular.z = self.angular_speed
+                    self.publisher_.publish(twist)
+                
+                
         except Exception as e:
             self.get_logger().error(f"Exception: {e}")
         finally:
