@@ -9,6 +9,7 @@ class CustomTeleop(Node):
 
     def __init__(self):
         super().__init__('turtlebot_teleop')
+        self.declare_parameter('use_sim_time', True) 
         self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
         self.linear_speed = 0.0
         self.angular_speed = 0.0

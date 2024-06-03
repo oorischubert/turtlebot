@@ -23,7 +23,8 @@ def generate_launch_description():
         ]),
         launch_arguments={
             'scan_mode': 'Boost',
-            'frame_id': 'base_link'
+            'frame_id': 'base_link',
+            'use_sim_time': 'true'
         }.items()
     )
 
@@ -44,6 +45,7 @@ def generate_launch_description():
         package='turtlebot',
         executable='motor_controller',
         name='motor_controller'
+        parameters=[{'use_sim_time': True}] 
     )
 
     on_motor_controller_exit = RegisterEventHandler(
