@@ -24,7 +24,7 @@ def generate_launch_description():
         launch_arguments={
             'scan_mode': 'Boost',
             'frame_id': 'base_link',
-            'use_sim_time': 'true'
+            #'use_sim_time': 'true'
         }.items()
     )
 
@@ -44,8 +44,8 @@ def generate_launch_description():
     motor_controller = Node(
         package='turtlebot',
         executable='motor_controller',
-        name='motor_controller'
-        parameters=[{'use_sim_time': True}] 
+        name='motor_controller',
+        #parameters=[{'use_sim_time': True}] 
     )
 
     on_motor_controller_exit = RegisterEventHandler(
@@ -61,11 +61,19 @@ def generate_launch_description():
         )
     )
 
+    static_transform_publisher = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'odom', 'base_link']
+    )
+
     return LaunchDescription([
         #static_tf_broadcaster,
         delayed_rplidar_launch,  # Use the delayed action for RPLIDAR
         motor_controller,
-        on_motor_controller_exit
+        on_motor_controller_exit,
+        static_transform_publisher
     ])
 
 

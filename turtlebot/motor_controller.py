@@ -13,7 +13,6 @@ class DiffDriveController(Node):
 
     def __init__(self):
         super().__init__('motor_controller')
-        self.declare_parameter('use_sim_time', True) 
         # esp comms init 
         self.esp = MotorController()
         self.motorMessage = MotorMessage()
