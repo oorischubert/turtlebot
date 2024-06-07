@@ -6,7 +6,8 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-
+from launch.substitutions import PathJoinSubstitution
+from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
 
 
@@ -18,6 +19,13 @@ def generate_launch_description():
     # !!! MAKE SURE YOU SET THE PACKAGE NAME CORRECTLY !!!
 
     package_name='turtlebot' #<--- CHANGE ME
+
+    world_path = PathJoinSubstitution([
+    FindPackageShare('aws_robomaker_small_warehouse_world'),
+    'worlds',
+    'no_roof_small_warehouse',
+    'no_roof_small_warehouse.world'
+    ])
 
     rsp = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
@@ -52,7 +60,13 @@ def generate_launch_description():
     spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
                         arguments=['-topic', 'robot_description',
                                    '-entity', 'my_bot'],
-                        output='screen')
+                        output='screen',
+                        #world path
+                        launch_arguments={
+                        'world': world_path,
+                        'pause': 'true',
+                         }.items()
+                        )
 
 
     diff_drive_spawner = Node(
