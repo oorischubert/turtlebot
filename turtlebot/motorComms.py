@@ -2,7 +2,7 @@ import serial
 import time
 import struct
 from serial.tools import list_ports
-from turtlebot.configuration import *
+from configuration import *
 
 class MotorMessage:
     def __init__(self):
@@ -14,8 +14,8 @@ class MotorMessage:
         self.velocity_angular = 0
 
 class MotorController:
-    # def __init__(self):
-    #     self.port
+    def __init__(self):
+        self.port = ""
 
     def initHandshake(self,port=""):
         try:
@@ -87,7 +87,11 @@ def main():
     """Main function to control omni-wheel car."""
     esp = MotorController()
     motorMessage = MotorMessage()
-    connect_bool = esp.initHandshake()
+    ports = esp.scan_devices()
+    print("select port (0-n): %s",ports)
+    portSelect = int(input())
+    esp.port = ports[portSelect]
+    connect_bool = esp.initHandshake(esp.port)
     if not connect_bool: 
         print("[motorComms] Error opening serial port!")
     else: 
@@ -100,14 +104,6 @@ def main():
             esp.read_serial_data(motorMessage)
             print(f"[motorComms] Linear Vel: {motorMessage.velocity_x}")
             print(f"[motorComms] Angular Vel: {motorMessage.velocity_angular}\n")
-            # for i in range(10):
-            #     start_time = time.time()
-            #     while time.time() - start_time < 10:
-            #         esp.send_velocity_command(i * 0.05, 0)
-            #         esp.read_serial_data(motorMessage)
-            #         print(f"Linear Vel: {motorMessage.velocity_x}")
-            #         print(f"Angular Vel: {motorMessage.velocity_angular}\n")
-            #         time.sleep(0.1)
     except KeyboardInterrupt:
         esp.shutdown()
         print("[motorComms] Program stopped by user")
