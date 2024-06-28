@@ -2,7 +2,7 @@ import serial
 import time
 import struct
 from serial.tools import list_ports
-from configuration import *
+from turtlebot.configuration import *
 
 class MotorMessage:
     def __init__(self):
@@ -52,7 +52,7 @@ class MotorController:
         """Send velocity command to turtlebot."""
         data = bytearray(SIZE_OF_RX_DATA)
         data[0:2] = HEADER, HEADER
-        data[2] = VELOCITY_MODE
+        data[2] = CONTROL_MODE
 
         # Packing velocity into 4 bytes
         data[3:7] = struct.pack('f', velocity_x)  # velocity x
@@ -100,6 +100,13 @@ def main():
     try:
         while True:
             speed = float(input("Enter speed: "))
+            if type(speed) != float:
+                print("[motorComms] Invalid input! Please enter a float.")
+                continue
+            #if q inputted exit task
+            if (speed == "q" or speed == "Q"):
+                print("[motorComms] Program stopped by user")
+                break
             esp.send_velocity_command(speed, 0)
             esp.read_serial_data(motorMessage)
             print(f"[motorComms] Linear Vel: {motorMessage.velocity_x}")

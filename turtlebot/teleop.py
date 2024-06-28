@@ -12,6 +12,8 @@ class CustomTeleop(Node):
         self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
         self.linear_speed = 0.0
         self.angular_speed = 0.0
+        self.max_angular_speed = 10.0
+        self.max_linear_speed = 1.0
         self.speed_increment_lin = 0.025
         self.speed_increment_ang = 0.15
         self.print_instructions()
@@ -49,13 +51,13 @@ CTRL-C to quit
             while rclpy.ok():
                 key = self.get_key()
                 if key == 'w':
-                    self.linear_speed = min(1.0, self.linear_speed + self.speed_increment_lin)
+                    self.linear_speed = min(self.max_linear_speed, self.linear_speed + self.speed_increment_lin)
                 elif key == 's':
-                    self.linear_speed = max(-1.0, self.linear_speed - self.speed_increment_lin)
+                    self.linear_speed = max(-self.max_linear_speed, self.linear_speed - self.speed_increment_lin)
                 elif key == 'a':
-                    self.angular_speed = min(1.0, self.angular_speed + self.speed_increment_ang)
+                    self.angular_speed = min(self.max_angular_speed, self.angular_speed + self.speed_increment_ang)
                 elif key == 'd':
-                    self.angular_speed = max(-1.0, self.angular_speed - self.speed_increment_ang)
+                    self.angular_speed = max(-self.max_angular_speed, self.angular_speed - self.speed_increment_ang)
                 elif key == 'x':
                     self.linear_speed = 0.0
                     self.angular_speed = 0.0

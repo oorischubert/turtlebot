@@ -16,7 +16,6 @@ class DiffDriveController(Node):
         # esp comms init 
         self.esp = MotorController()
         self.motorMessage = MotorMessage()
-
         connectBool = self.esp.initHandshake()
         if not connectBool: 
             self.get_logger().info("Error opening serial port!")
