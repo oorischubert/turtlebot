@@ -2,7 +2,7 @@ import serial
 import time
 import struct
 from serial.tools import list_ports
-from turtlebot.configuration import *
+from configuration import *
 
 class MotorMessage:
     def __init__(self):
@@ -56,8 +56,7 @@ class MotorController:
 
         # Packing velocity into 4 bytes
         data[3:7] = struct.pack('f', velocity_x)  # velocity x
-        # data[7:11] = velocity_bytes # velocity y (not neccesary for diff-drive)
-        data[11:15] = struct.pack('f', velocity_angular) #velocity angular z
+        data[7:11] = struct.pack('f', velocity_angular) #velocity angular z
         checksum = self.calculate_transmit_checksum(data)
         data[SIZE_OF_RX_DATA - 2] = checksum
         data[SIZE_OF_RX_DATA - 1] = TAIL
@@ -107,7 +106,7 @@ def main():
             if (speed == "q" or speed == "Q"):
                 print("[motorComms] Program stopped by user")
                 break
-            esp.send_velocity_command(speed, 0)
+            esp.send_velocity_command(0, speed)
             esp.read_serial_data(motorMessage)
             print(f"[motorComms] Linear Vel: {motorMessage.velocity_x}")
             print(f"[motorComms] Angular Vel: {motorMessage.velocity_angular}\n")
