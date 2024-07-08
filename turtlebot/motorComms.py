@@ -20,7 +20,7 @@ class MotorController:
     def initHandshake(self,port=""):
         try:
             if port=="":
-                self.port=self.scan_devices()[0]
+                self.port=self.scan_devices()[1]
             self.serial = serial.Serial(self.port, BAUD_RATE, timeout=TIMEOUT)
             return True
         except Exception as e:
@@ -67,7 +67,7 @@ class MotorController:
         """Read data from serial and process it."""
         if self.serial.in_waiting > 0:
             received_data = self.serial.read(self.serial.in_waiting)
-            if len(received_data) >= 52 and received_data[0:2] == bytes([HEADER, HEADER]):
+            if len(received_data) >= SIZE_OF_RX_DATA and received_data[0:2] == bytes([HEADER, HEADER]):
                 if self.calculate_receive_checksum(received_data) == received_data[50]:
                     unpacked_data = struct.unpack('f'*6, received_data[2:26])
                     #print(unpacked_data)

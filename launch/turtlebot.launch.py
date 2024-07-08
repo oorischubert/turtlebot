@@ -52,13 +52,13 @@ def generate_launch_description():
     low_level_bridge_node = Node(
         package='turtlebot_motorBridge',
         executable='low_level_bridge',
-        name='low_level_bridge'
+        name='low_level_bridge',
+        parameters=[{'device': '/dev/ttyUSB0'}]  # Include the device parameter here
     )
-
     return LaunchDescription([
         delayed_rplidar_launch,  # Use the delayed action for RPLIDAR
         #motor_controller,
-        static_transform_publisher,
+        #static_transform_publisher,
         low_level_bridge_node,  # Add the low_level_bridge node here
         #imu_launch  # Include the IMU launch file
     ])
