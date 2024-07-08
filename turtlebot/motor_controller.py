@@ -52,13 +52,22 @@ class DiffDriveController(Node):
         odom.header.stamp = self.get_clock().now().to_msg()
         odom.header.frame_id = 'odom'
         odom.child_frame_id = 'base_link'
+        
+        # Ensure positions are floats
+        position_x = float(self.motorMessage.position_x)
+        position_y = float(self.motorMessage.position_y)
+        position_angular = float(self.motorMessage.position_angular)
+        
         # Set position
-        odom.pose.pose.position = Point(x=self.motorMessage.position_x, y=self.motorMessage.position_y, z=0.0)
+        odom.pose.pose.position = Point(x=position_x, y=position_y, z=0.0)
+        
         # Convert Euler angles to quaternion and set orientation
-        quaternion = transforms3d.euler.euler2quat(0, 0, self.motorMessage.position_angular)
+        quaternion = transforms3d.euler.euler2quat(0, 0, position_angular)
         odom.pose.pose.orientation = Quaternion(x=quaternion[1], y=quaternion[2], z=quaternion[3], w=quaternion[0])
-        odom.twist.twist.linear.x = self.motorMessage.velocity_x
-        odom.twist.twist.angular.z = self.motorMessage.velocity_angular
+        
+        odom.twist.twist.linear.x = float(self.motorMessage.velocity_x)
+        odom.twist.twist.angular.z = float(self.motorMessage.velocity_angular)
+        
         self.odom_publisher.publish(odom)
 
     def destroy_node(self):

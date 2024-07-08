@@ -2,7 +2,7 @@ import serial
 import time
 import struct
 from serial.tools import list_ports
-from configuration import *
+from turtlebot.configuration import *
 
 class MotorMessage:
     def __init__(self):
