@@ -33,14 +33,6 @@ def generate_launch_description():
         actions=[rplidar_launch]
     )
 
-    #deprecates as i now have odometry data from motor controller
-    # static_tf_broadcaster = Node(
-    #     package='tf2_ros',
-    #     executable='static_transform_publisher',
-    #     arguments=['0', '0', '0', '0', '0', '0', 'map', 'base_link'],
-    #     name='static_tf_broadcaster'
-    # )
-
     motor_controller = Node(
         package='turtlebot',
         executable='motor_controller',
@@ -61,6 +53,12 @@ def generate_launch_description():
         )
     )
 
+    low_level_bridge_node = Node(
+        package='turtlebot_motorBridge',
+        executable='low_level_bridge',
+        name='low_level_bridge'
+    )
+
     static_transform_publisher = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -71,8 +69,9 @@ def generate_launch_description():
     return LaunchDescription([
         #static_tf_broadcaster,
         delayed_rplidar_launch,  # Use the delayed action for RPLIDAR
-        motor_controller,
-        on_motor_controller_exit,
+        #motor_controller,
+        #on_motor_controller_exit,
+        low_level_bridge_node,
         static_transform_publisher
     ])
 
@@ -84,9 +83,11 @@ def generate_launch_description():
     #git clone https://github.com/oorischubert/turtlebot
     #source install/setup.bash
     #ros2 launch turtlebot turtlebot_launch.py
-   
-    #local keyboard teleop
     #ros2 run turtlebot teleop
+
+    #turtlebot_motorBridge: 
+    #git clone https://github.com/oorischubert/turtlebot_motorBridge.git
+    #ros2 run turtlebot_motorBridge low_level_bridge
 
     #rplidar: 
     #git clone -b ros2 https://github.com/Slamtec/rplidar_ros.git
