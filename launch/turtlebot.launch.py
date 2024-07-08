@@ -8,24 +8,25 @@ from launch.events import Shutdown
 import os
 import subprocess
 
-def exit_process_function(_launch_context):
-    #not working yet!
-    cmd = [
-        'ros2', 'topic', 'pub', '-t', '1', '/cmd_vel', 'geometry_msgs/msg/Twist',
-        '{linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}'
-    ]
-    subprocess.run(cmd, shell=True)
-
 def generate_launch_description():
+    rplidar_ros_share = get_package_share_directory('rplidar_ros')
+    imu_ros_share = get_package_share_directory('ros-imu-bno055')
+
     rplidar_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            os.path.join(get_package_share_directory('rplidar_ros'), 'launch', 'rplidar_a2m8_launch.py')
+            os.path.join(rplidar_ros_share, 'launch', 'rplidar_a2m8_launch.py')
         ]),
         launch_arguments={
             'scan_mode': 'Boost',
             'frame_id': 'base_link',
-            #'use_sim_time': 'true'
+            # 'use_sim_time': 'true'
         }.items()
+    )
+
+    imu_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            os.path.join(imu_ros_share, 'launch', 'imu.launch')
+        ])
     )
 
     delayed_rplidar_launch = TimerAction(
@@ -37,26 +38,7 @@ def generate_launch_description():
         package='turtlebot',
         executable='motor_controller',
         name='motor_controller',
-        #parameters=[{'use_sim_time': True}] 
-    )
-
-    on_motor_controller_exit = RegisterEventHandler(
-        OnProcessExit(
-            target_action=motor_controller,
-            on_exit=[
-                LogInfo(msg="Motor shutdown initiated..."),
-                EmitEvent(event=Shutdown(reason='Motor controller exited')),
-                OpaqueFunction(
-                        function=exit_process_function
-                    ),
-            ]
-        )
-    )
-
-    low_level_bridge_node = Node(
-        package='turtlebot_motorBridge',
-        executable='low_level_bridge',
-        name='low_level_bridge'
+        # parameters=[{'use_sim_time': True}]
     )
 
     static_transform_publisher = Node(
@@ -66,48 +48,56 @@ def generate_launch_description():
         arguments=['0', '0', '0', '0', '0', '0', 'odom', 'base_link']
     )
 
+    # Add the low_level_bridge node from turtlebot_motorBridge package
+    low_level_bridge_node = Node(
+        package='turtlebot_motorBridge',
+        executable='low_level_bridge',
+        name='low_level_bridge'
+    )
+
     return LaunchDescription([
-        #static_tf_broadcaster,
         delayed_rplidar_launch,  # Use the delayed action for RPLIDAR
         #motor_controller,
-        #on_motor_controller_exit,
-        low_level_bridge_node,
-        static_transform_publisher
+        static_transform_publisher,
+        low_level_bridge_node,  # Add the low_level_bridge node here
+        #imu_launch  # Include the IMU launch file
     ])
 
+# Additional information for installation and usage
 
-    #turtlebot:
-    #apt-get install -y python3-pip
-    #pip3 install pyserial
-    #pip3 install transforms3d
-    #git clone https://github.com/oorischubert/turtlebot
-    #source install/setup.bash
-    #ros2 launch turtlebot turtlebot_launch.py
-    #ros2 run turtlebot teleop
+# turtlebot:
+# apt-get install -y python3-pip
+# pip3 install pyserial
+# pip3 install transforms3d
+# git clone https://github.com/oorischubert/turtlebot
+# source install/setup.bash
+# ros2 launch turtlebot turtlebot_launch.py
 
-    #turtlebot_motorBridge: 
-    #git clone https://github.com/oorischubert/turtlebot_motorBridge.git
-    #ros2 run turtlebot_motorBridge low_level_bridge
+#turtlebot_motorBridge: 
+#git clone https://github.com/oorischubert/turtlebot_motorBridge.git
+#ros2 run turtlebot_motorBridge low_level_bridge
 
-    #rplidar: 
-    #git clone -b ros2 https://github.com/Slamtec/rplidar_ros.git
-    #ros2 launch rplidar_ros rplidar_a2m8_launch.py frame_id:=base_link
+# local keyboard teleop
+# ros2 run turtlebot teleop
 
-    #base_link: 
-    #sudo apt install ros-humble-tf2-ros
-    #ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 map base_link
+# rplidar:
+# git clone -b ros2 https://github.com/Slamtec/rplidar_ros.git
+# ros2 launch rplidar_ros rplidar_a2m8_launch.py frame_id:=base_link
 
-    # rpi4 usb port connections:
-    # |------------------|
-    # | esp32  | rplidar |
-    # |------------------|
-    # | empty  |  empty  |
-    # |------------------|
+# base_link:
+# sudo apt install ros-humble-tf2-ros
+# ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 map base_link
 
-    # rpi5 usb port connections:
-    # |------------------|
-    # | rplidar | esp32  |
-    # |------------------|
-    # | Bootfs  | empty  |
-    # |------------------|
+# rpi4 usb port connections:
+# |------------------|
+# | esp32  | rplidar |
+# |------------------|
+# | empty  |  empty  |
+# |------------------|
 
+# rpi5 usb port connections:
+# |------------------|
+# | rplidar | esp32  |
+# |------------------|
+# | Bootfs  | empty  |
+# |------------------|
