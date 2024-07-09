@@ -10,28 +10,28 @@ import subprocess
 
 def generate_launch_description():
     rplidar_ros_share = get_package_share_directory('rplidar_ros')
-    imu_ros_share = get_package_share_directory('ros-imu-bno055')
 
     rplidar_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             os.path.join(rplidar_ros_share, 'launch', 'rplidar_a2m8_launch.py')
         ]),
         launch_arguments={
+            'serial_port': '/dev/ttyUSB_rplidar', 
             'scan_mode': 'Boost',
             'frame_id': 'base_link',
             # 'use_sim_time': 'true'
         }.items()
     )
 
-    imu_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            os.path.join(imu_ros_share, 'launch', 'imu.launch')
-        ])
-    )
-
     delayed_rplidar_launch = TimerAction(
         period=2.0,  # Delay in seconds before starting the RPLIDAR to prevent startup interference from other processes
         actions=[rplidar_launch]
+    )
+
+    imu_node = Node(
+        package='imu_bno055',
+        executable='bno055_i2c_node',
+        name='bno055_i2c_node',
     )
 
     motor_controller = Node(
@@ -53,17 +53,17 @@ def generate_launch_description():
         package='turtlebot_motorBridge',
         executable='low_level_bridge',
         name='low_level_bridge',
-        parameters=[{'device': '/dev/ttyUSB0'}]  # Include the device parameter here
+        parameters=[{'device': '/dev/ttyUSB_esp32'}]  # Include the device parameter here
     )
     return LaunchDescription([
-        delayed_rplidar_launch,  # Use the delayed action for RPLIDAR
+        delayed_rplidar_launch, 
         #motor_controller,
         #static_transform_publisher,
-        low_level_bridge_node,  # Add the low_level_bridge node here
-        #imu_launch  # Include the IMU launch file
+        low_level_bridge_node, 
+        imu_node  
     ])
 
-# Additional information for installation and usage
+# Additional information for installation and usage:
 
 # turtlebot:
 # apt-get install -y python3-pip
@@ -73,9 +73,10 @@ def generate_launch_description():
 # source install/setup.bash
 # ros2 launch turtlebot turtlebot_launch.py
 
-#turtlebot_motorBridge: 
-#git clone https://github.com/oorischubert/turtlebot_motorBridge.git
-#ros2 run turtlebot_motorBridge low_level_bridge
+# turtlebot_motorBridge: 
+# sudo apt-get install libboost-all-dev
+# git clone https://github.com/oorischubert/turtlebot_motorBridge.git
+# ros2 run turtlebot_motorBridge low_level_bridge
 
 # local keyboard teleop
 # ros2 run turtlebot teleop
@@ -83,6 +84,12 @@ def generate_launch_description():
 # rplidar:
 # git clone -b ros2 https://github.com/Slamtec/rplidar_ros.git
 # ros2 launch rplidar_ros rplidar_a2m8_launch.py frame_id:=base_link
+
+# imu_bno055:
+# git clone https://github.com/dheera/ros-imu-bno055.git
+# sudo apt install libi2c-dev
+# cp CMakeLists.ros2.txt CMakeLists.txt (in imu_bno055 folder)
+# ros2 run imu_bno055 bno055_i2c_node
 
 # base_link:
 # sudo apt install ros-humble-tf2-ros
@@ -97,7 +104,7 @@ def generate_launch_description():
 
 # rpi5 usb port connections:
 # |------------------|
-# | rplidar | esp32  |
+# | esp32  | rplidar |
 # |------------------|
-# | Bootfs  | empty  |
+# | empty  |  empty  |
 # |------------------|
