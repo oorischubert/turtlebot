@@ -16,7 +16,7 @@ def generate_launch_description():
             os.path.join(rplidar_ros_share, 'launch', 'rplidar_a2m8_launch.py')
         ]),
         launch_arguments={
-            'serial_port': '/dev/ttyUSB_rplidar', 
+            'serial_port': '/dev/ttyUSB0', 
             'scan_mode': 'Boost',
             'frame_id': 'base_link',
             # 'use_sim_time': 'true'
@@ -53,7 +53,7 @@ def generate_launch_description():
         package='turtlebot_motorBridge',
         executable='low_level_bridge',
         name='low_level_bridge',
-        parameters=[{'device': '/dev/ttyUSB_esp32'}]  # Include the device parameter here
+        parameters=[{'device': '/dev/ttyUSB1'}]  # Include the device parameter here
     )
     return LaunchDescription([
         delayed_rplidar_launch, 
@@ -83,7 +83,7 @@ def generate_launch_description():
 
 # rplidar:
 # git clone -b ros2 https://github.com/Slamtec/rplidar_ros.git
-# ros2 launch rplidar_ros rplidar_a2m8_launch.py frame_id:=base_link
+# ros2 launch rplidar_ros rplidar_a2m8_launch.py frame_id:=base_link scan_mode:=Boost
 
 # imu_bno055:
 # git clone https://github.com/dheera/ros-imu-bno055.git
