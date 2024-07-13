@@ -16,7 +16,7 @@ def generate_launch_description():
             os.path.join(rplidar_ros_share, 'launch', 'rplidar_a2m8_launch.py')
         ]),
         launch_arguments={
-            'serial_port': '/dev/ttyUSB0', 
+            'serial_port': '/dev/ttyUSB_rplidar', 
             'scan_mode': 'Boost',
             'frame_id': 'base_link',
             # 'use_sim_time': 'true'
@@ -53,7 +53,7 @@ def generate_launch_description():
         package='turtlebot_motorBridge',
         executable='low_level_bridge',
         name='low_level_bridge',
-        parameters=[{'device': '/dev/ttyUSB1'}]  # Include the device parameter here
+        parameters=[{'device': '/dev/ttyUSB_esp32'}]  # Include the device parameter here
     )
     return LaunchDescription([
         delayed_rplidar_launch, 
@@ -74,7 +74,7 @@ def generate_launch_description():
 # ros2 launch turtlebot turtlebot_launch.py
 
 # turtlebot_motorBridge: 
-# sudo apt-get install libboost-all-dev
+# sudo apt-get install libboost-all-dev -y
 # git clone https://github.com/oorischubert/turtlebot_motorBridge.git
 # ros2 run turtlebot_motorBridge low_level_bridge
 
