@@ -2,7 +2,7 @@ import serial
 import time
 import struct
 from serial.tools import list_ports
-from turtlebot.configuration import *
+from configuration import *
 
 class MotorMessage:
     def __init__(self):
@@ -12,10 +12,13 @@ class MotorMessage:
         self.velocity_x = 0
         self.velocity_y = 0
         self.velocity_angular = 0
+        self.encoder_left_wheel = 0
+        self.encoder_right_wheel = 0
 
 class MotorController:
     def __init__(self):
         self.port = ""
+        self.controllMode = OFEKBOT_CONTROLL_MODE
 
     def initHandshake(self,port=""):
         try:
@@ -69,14 +72,21 @@ class MotorController:
             received_data = self.serial.read(self.serial.in_waiting)
             if len(received_data) >= SIZE_OF_RX_DATA and received_data[0:2] == bytes([HEADER, HEADER]):
                 if self.calculate_receive_checksum(received_data) == received_data[50]:
-                    unpacked_data = struct.unpack('f'*6, received_data[2:26])
-                    #print(unpacked_data)
-                    motorMessage.position_x = unpacked_data[0]
-                    motorMessage.position_y = unpacked_data[1]
-                    motorMessage.position_angular = unpacked_data[2]
-                    motorMessage.velocity_x = unpacked_data[3]
-                    motorMessage.velocity_y = unpacked_data[4]
-                    motorMessage.velocity_angular = unpacked_data[5]
+                    if self.controllMode == OFEKBOT_CONTROLL_MODE:
+                        unpacked_data = struct.unpack('f'*6, received_data[2:26])
+                        motorMessage.position_x = unpacked_data[0]
+                        motorMessage.position_y = unpacked_data[1]
+                        motorMessage.position_angular = unpacked_data[2]
+                        motorMessage.velocity_x = unpacked_data[3]
+                        motorMessage.velocity_y = unpacked_data[4]
+                        motorMessage.velocity_angular = unpacked_data[5]
+                    elif self.controllMode == ARTICUBOT_CONTROLL_MODE:
+                        unpacked_data = struct.unpack('f'*2, received_data[2:10])
+                        motorMessage.velocity_x = unpacked_data[0]
+                        motorMessage.velocity_y = unpacked_data[1]
+                        unpacked_data = struct.unpack('q'*2, received_data[10:26])
+                        motorMessage.encoder_left_wheel = unpacked_data[0]
+                        motorMessage.encoder_right_wheel = unpacked_data[1]
                 else:
                     print("[motorComms] Checksum mismatch")
             else:
@@ -86,6 +96,7 @@ def main():
     """Main function to control omni-wheel car."""
     esp = MotorController()
     motorMessage = MotorMessage()
+    esp.controllMode = ARTICUBOT_CONTROLL_MODE
     ports = esp.scan_devices()
     print("select port (0-n): %s",ports)
     portSelect = int(input())
@@ -106,10 +117,16 @@ def main():
             if (speed == "q" or speed == "Q"):
                 print("[motorComms] Program stopped by user")
                 break
-            esp.send_velocity_command(0, speed)
+            esp.send_velocity_command(speed*10, speed*10)
             esp.read_serial_data(motorMessage)
-            print(f"[motorComms] Linear Vel: {motorMessage.velocity_x}")
-            print(f"[motorComms] Angular Vel: {motorMessage.velocity_angular}\n")
+            if esp.controllMode == OFEKBOT_CONTROLL_MODE:
+                print(f"[motorComms] Linear Vel: {motorMessage.velocity_x}")
+                print(f"[motorComms] Angular Vel: {motorMessage.velocity_angular}\n")
+            elif esp.controllMode == ARTICUBOT_CONTROLL_MODE:
+                print(f"[motorComms] Left Wheel Velocity: {motorMessage.velocity_x}")
+                print(f"[motorComms] Right Wheel Velocity: {motorMessage.velocity_y}")
+                print(f"[motorComms] Left Wheel Encoder: {motorMessage.encoder_left_wheel}")
+                print(f"[motorComms] Right Wheel Encoder: {motorMessage.encoder_right_wheel}\n")
     except KeyboardInterrupt:
         esp.shutdown()
         print("[motorComms] Program stopped by user")

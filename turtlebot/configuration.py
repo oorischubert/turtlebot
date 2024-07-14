@@ -11,3 +11,6 @@ CONTROL_MODE = 1 # 0 = position, 1 = velocity, 2 = odometry, 3 = pos_pid
 ESP_SERIAL_PORT = '/dev/ttyUSB_esp32' #not always the same! #deprecated
 BAUD_RATE = 115200
 TIMEOUT = 1
+
+OFEKBOT_CONTROLL_MODE = 0
+ARTICUBOT_CONTROLL_MODE = 1
