@@ -59,7 +59,10 @@ def generate_launch_description():
     # Run the spawner node from the gazebo_ros package. The entity name doesn't really matter if you only have a single robot.
     spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
                         arguments=['-topic', 'robot_description',
-                                   '-entity', 'my_bot'],
+                                   '-entity', 'my_bot',
+                                    '-x', '0',
+                                    '-y', '0',
+                                    '-z', '0.04'],
                         output='screen',
                         )
 
@@ -74,6 +77,13 @@ def generate_launch_description():
         package="controller_manager",
         executable="spawner.py",
         arguments=["joint_broad"],
+    )
+
+    bookstore = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [get_package_share_directory(
+                'aws_robomaker_bookstore_world'), '/launch/bookstore.launch.py']
+        )
     )
 
 
@@ -103,11 +113,21 @@ def generate_launch_description():
         gazebo,
         spawn_entity,
         diff_drive_spawner,
-        joint_broad_spawner
+        joint_broad_spawner,
+        #bookstore
     ])
 
-#keyboard control:
-# ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/diff_cont/cmd_vel_unstamped
+
+# . /usr/share/gazebo/setup.bash
+# ps aux | grep gzserver   <- reset background segmentation fault
 
 #warehouse world launch:
 # ros2 launch turtlebot gazebo.launch.py world:=$HOME/ros2_ws/src/aws-robomaker-small-warehouse-world/worlds/no_roof_small_warehouse/no_roof_small_warehouse.world
+#house world launch:
+# ros2 launch turtlebot gazebo.launch.py world:=$HOME/ros2_ws/src/aws-robomaker-small-house-world/worlds/small_house.world
+#bookstore world launch:
+# ros2 launch turtlebot gazebo.launch.py world:=$HOME/ros2_ws/src/aws-robomaker-bookstore-world/worlds/bookstore.world
+
+#git clone -b ros2 https://github.com/aws-robotics/aws-robomaker-small-warehouse-world.git 
+#git clone -b ros2 https://github.com/aws-robotics/aws-robomaker-small-house-world.git
+#git clone -b ros2 https://github.com/aws-robotics/aws-robomaker-bookstore-world.git

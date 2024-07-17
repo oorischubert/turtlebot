@@ -8,13 +8,16 @@ def generate_launch_description():
 
         Node(
             package='rplidar_ros',
-            executable='rplidar_composition',
-            output='screen',
-            parameters=[{
-                'serial_port': '/dev/ttyUSB_rplidar',
-                'frame_id': 'laser_frame',
-                'angle_compensate': True,
-                'scan_mode': 'Standard'
-            }]
-        )
+            executable='rplidar_node',
+            name='rplidar_node',
+            parameters=[{'channel_type':'serial',
+                         'serial_port': '/dev/ttyUSB_rplidar',
+                         'serial_baudrate': '115200',
+                         'frame_id': 'laser_frame',
+                         'inverted': False,
+                         'angle_compensate': True,
+                         'scan_mode' : 'Boost'
+                         }],
+            output='screen'),
+            
     ])
