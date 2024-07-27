@@ -9,7 +9,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command
 from launch.actions import RegisterEventHandler
 from launch.event_handlers import OnProcessStart
-
+from launch.event_handlers import OnProcessExit
 from launch_ros.actions import Node
 
 
@@ -40,7 +40,7 @@ def generate_launch_description():
             package="twist_mux",
             executable="twist_mux",
             parameters=[twist_mux_params],
-            remappings=[('/cmd_vel_out','/diff_cont/cmd_vel_unstamped')]
+            remappings=[('/cmd_vel_out','/diffbot_base_controller/cmd_vel_unstamped')]
         )
     
     rplidar = IncludeLaunchDescription(
@@ -64,38 +64,62 @@ def generate_launch_description():
     controller_manager = Node(
         package="controller_manager",
         executable="ros2_control_node",
-        parameters=[{'robot_description': robot_description},
-                    controller_params_file]
+        output="both",
+        parameters=[controller_params_file],
+        remappings=[
+            ("~/robot_description", "/robot_description"),
+        ],
     )
 
     delayed_controller_manager = TimerAction(period=3.0, actions=[controller_manager])
 
+    joint_state_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+    )
+
+    robot_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["diffbot_base_controller", "--controller-manager", "/controller_manager"],
+    )
+
     diff_drive_spawner = Node(
         package="controller_manager",
-        executable="spawner.py",
+        executable="spawner",
         arguments=["diff_cont"],
     )
 
     delayed_diff_drive_spawner = RegisterEventHandler(
         event_handler=OnProcessStart(
             target_action=controller_manager,
-            on_start=[diff_drive_spawner],
+            on_start=[robot_controller_spawner],
+        )
+    )
+
+     # Delay start of robot_controller after `joint_state_broadcaster`
+    delay_robot_controller_spawner_after_joint_state_broadcaster_spawner = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=joint_state_broadcaster_spawner,
+            on_exit=[robot_controller_spawner],
         )
     )
 
     joint_broad_spawner = Node(
         package="controller_manager",
-        executable="spawner.py",
+        executable="spawner",
         arguments=["joint_broad"],
     )
 
     delayed_joint_broad_spawner = RegisterEventHandler(
         event_handler=OnProcessStart(
             target_action=controller_manager,
-            on_start=[joint_broad_spawner],
+            on_start=[joint_state_broadcaster_spawner],
         )
     )
-
+#    sudo apt install ros-humble-diff-drive-controller
+#    sudo apt install ros-humble-joint-state-broadcaster
 
     # Code for delaying a node (I haven't tested how effective it is)
     # 
@@ -121,7 +145,8 @@ def generate_launch_description():
         joystick,
         twist_mux,
         delayed_controller_manager,
-        delayed_diff_drive_spawner,
+        #delayed_diff_drive_spawner,
+        delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
         delayed_joint_broad_spawner,
         delayed_rplidar_launch
     ])
