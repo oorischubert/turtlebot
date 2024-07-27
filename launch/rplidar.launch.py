@@ -12,7 +12,7 @@ def generate_launch_description():
             name='rplidar_node',
             parameters=[{'channel_type':'serial',
                          'serial_port': '/dev/ttyUSB_rplidar',
-                         'serial_baudrate': '115200',
+                         'serial_baudrate': 115200,
                          'frame_id': 'laser_frame',
                          'inverted': False,
                          'angle_compensate': True,
