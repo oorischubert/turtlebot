@@ -4,12 +4,14 @@ from ament_index_python.packages import get_package_share_directory
 
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
-
+from launch.actions import RegisterEventHandler
+from launch.event_handlers import OnProcessStart
+from launch.event_handlers import OnProcessExit
 
 
 def generate_launch_description():
@@ -44,7 +46,7 @@ def generate_launch_description():
             package="twist_mux",
             executable="twist_mux",
             parameters=[twist_mux_params, {'use_sim_time': True}],
-            remappings=[('/cmd_vel_out','/diff_cont/cmd_vel_unstamped')]
+            remappings=[('/cmd_vel_out','/diffbot_base_controller/cmd_vel_unstamped')]
         )
 
     gazebo_params_file = os.path.join(get_package_share_directory(package_name),'config','gazebo_params.yaml')
@@ -55,6 +57,18 @@ def generate_launch_description():
                     get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')]),
                     launch_arguments={'extra_gazebo_args': '--ros-args --params-file ' + gazebo_params_file}.items() 
              )
+    
+    controller_params_file = os.path.join(get_package_share_directory(package_name),'config','my_controllers.yaml')
+    
+    controller_manager = Node(
+        package="controller_manager",
+        executable="ros2_control_node",
+        output="both",
+        parameters=[controller_params_file],
+        remappings=[
+            ("~/robot_description", "/robot_description"),
+        ],
+    )
 
     # Run the spawner node from the gazebo_ros package. The entity name doesn't really matter if you only have a single robot.
     spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
@@ -67,16 +81,32 @@ def generate_launch_description():
                         )
 
 
-    diff_drive_spawner = Node(
+    joint_state_broadcaster_spawner = Node(
         package="controller_manager",
-        executable="spawner.py",
-        arguments=["diff_cont"],
+        executable="spawner", #FOXY: add .py to spawner!
+        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
     )
 
-    joint_broad_spawner = Node(
+    delayed_controller_manager = TimerAction(period=3.0, actions=[controller_manager])
+
+    robot_controller_spawner = Node(
         package="controller_manager",
-        executable="spawner.py",
-        arguments=["joint_broad"],
+        executable="spawner", #FOXY: add .py to spawner!
+        arguments=["diffbot_base_controller", "--controller-manager", "/controller_manager"],
+    )
+
+    delay_robot_controller_spawner_after_joint_state_broadcaster_spawner = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=joint_state_broadcaster_spawner,
+            on_exit=[robot_controller_spawner],
+        )
+    )
+
+    delayed_joint_broad_spawner = RegisterEventHandler(
+        event_handler=OnProcessStart(
+            target_action=controller_manager,
+            on_start=[joint_state_broadcaster_spawner],
+        )
     )
 
     bookstore = IncludeLaunchDescription(
@@ -86,25 +116,6 @@ def generate_launch_description():
         )
     )
 
-
-    # Code for delaying a node (I haven't tested how effective it is)
-    # 
-    # First add the below lines to imports
-    # from launch.actions import RegisterEventHandler
-    # from launch.event_handlers import OnProcessExit
-    #
-    # Then add the following below the current diff_drive_spawner
-    # delayed_diff_drive_spawner = RegisterEventHandler(
-    #     event_handler=OnProcessExit(
-    #         target_action=spawn_entity,
-    #         on_exit=[diff_drive_spawner],
-    #     )
-    # )
-    #
-    # Replace the diff_drive_spawner in the final return with delayed_diff_drive_spawner
-
-
-
     # Launch them all!
     return LaunchDescription([
         rsp,
@@ -112,8 +123,9 @@ def generate_launch_description():
         twist_mux,
         gazebo,
         spawn_entity,
-        diff_drive_spawner,
-        joint_broad_spawner,
+        delayed_controller_manager,
+        delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
+        delayed_joint_broad_spawner,
         #bookstore
     ])
 
