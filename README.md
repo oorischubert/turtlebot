@@ -1,10 +1,10 @@
 # TurtleBot ROS2 Project
 
-A ROS2-based TurtleBot simulation and control project that provides a complete environment for robot simulation, navigation, and control using Gazebo.
+A ROS2-based TurtleBot simulation and control project that provides a complete environment for robot simulation, navigation, and control for Oori's custom TurtleBot variant.
 
 ## Overview
 
-This project implements a TurtleBot simulation environment with ROS2, featuring:
+This project implements control and simulation environments for TurtleBot with ROS2, featuring:
 
 - Gazebo simulation integration
 - Robot state publishing
@@ -78,9 +78,9 @@ ros2 launch turtlebot gazebo.launch.py world:=$HOME/ros2_ws/src/aws-robomaker-sm
 ros2 launch turtlebot gazebo.launch.py world:=$HOME/ros2_ws/src/aws-robomaker-bookstore-world/worlds/bookstore.world
 ```
 
-### Additional World Installation
+### World Installation
 
-To use custom worlds, clone the following repositories:
+To install the custom worlds, clone the following repositories:
 
 ```bash
 git clone -b ros2 https://github.com/aws-robotics/aws-robomaker-small-warehouse-world.git
