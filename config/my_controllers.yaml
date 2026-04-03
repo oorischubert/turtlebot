@@ -1,7 +1,6 @@
 controller_manager:
   ros__parameters:
     update_rate: 30
-    # use_sim_time: true
 
     diff_drive_base_controller:
       type: diff_drive_controller/DiffDriveController
@@ -15,48 +14,18 @@ diff_drive_base_controller:
     publish_rate: 50.0
     odom_frame_id: odom
     base_frame_id: base_link
+    enable_odom_tf: false
 
     left_wheel_names: ['left_wheel_joint']
     right_wheel_names: ['right_wheel_joint']
     wheel_separation: 0.15
     wheel_radius: 0.034
-    
-    use_stamped_vel: false
 
-    # open_loop: false    
-
-    # wheels_per_side: x
-    # wheel_separation_multiplier: x
-    # left_wheel_radius_multiplier: x
-    # right_wheel_radius_multiplier: x
-
-    # odom_frame_id: x
-    # pose_covariance_diagonal: x
-    # twist_covariance_diagonal: x
-    # open_loop: x
-    # enable_odom_tf: x
-
-    linear.x.has_velocity_limits: true
-    linear.x.has_acceleration_limits: true
-    linear.x.has_jerk_limits: false
     linear.x.max_velocity: 0.6
     linear.x.min_velocity: -0.6
     linear.x.max_acceleration: 1.0
-    linear.x.max_jerk: 0.0
-    linear.x.min_jerk: 0.0
 
-    angular.z.has_velocity_limits: true
-    angular.z.has_acceleration_limits: true
-    angular.z.has_jerk_limits: false
     angular.z.max_velocity: 2.0
     angular.z.min_velocity: -2.0
     angular.z.max_acceleration: 1.0
     angular.z.min_acceleration: -1.0
-    angular.z.max_jerk: 0.0
-    angular.z.min_jerk: 0.0
-
-
-
-
-# joint_broad:
-#   ros__parameters:

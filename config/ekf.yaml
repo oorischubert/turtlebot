@@ -8,9 +8,9 @@ ekf_filter_node:
     map_frame: map
     odom_frame: odom
     base_link_frame: base_link
-    world_frame: odom  # Use 'odom' when fusing continuous data like wheel odometry
+    world_frame: odom
 
-    # Wheel Odometry Configuration
+    # Wheel Odometry
     odom0: /odom
     odom0_config: [true,  true,  false,   # x, y, z
                    false, false, true,    # roll, pitch, yaw
@@ -21,15 +21,3 @@ ekf_filter_node:
     odom0_nodelay: false
     odom0_differential: false
     odom0_relative: false
-
-    # Localization Node (e.g., AMCL) Configuration
-    pose0: /amcl_pose
-    pose0_config: [true,  true,  false,   # x, y, z
-                   false, false, true,    # roll, pitch, yaw
-                   false, false, false,   # vx, vy, vz
-                   false, false, false,   # vroll, vpitch, vyaw
-                   false, false, false]   # ax, ay, az
-    pose0_queue_size: 10
-    pose0_nodelay: false
-    pose0_differential: false
-    pose0_relative: false

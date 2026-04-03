@@ -12,22 +12,15 @@ slam_toolbox:
     # ROS Parameters
     odom_frame: odom
     map_frame: map
-    base_frame: base_link # was base_footprint <- Oori.S
+    base_frame: base_link
     scan_topic: /scan
-    mode: localization # mapping
-
-    # if you'd like to immediately start continuing a map at a given pose
-    # or at the dock, but they are mutually exclusive, if pose is given
-    # will use pose
-    map_file_name: /home/oorischubert/ros2_ws/install/turtlebot/share/turtlebot/maps/bedroom_serial
-    # map_start_pose: [0.0, 0.0, 0.0]
-    map_start_at_dock: true
+    mode: mapping
 
     debug_logging: false
     throttle_scans: 1
     transform_publish_period: 0.02 #if 0 never publishes odometry
     map_update_interval: 5.0
-    resolution: 0.025 # was 0.05 <- Oori.S
+    resolution: 0.025
     max_laser_range: 12.0 #for rastering images
     minimum_time_interval: 0.5
     transform_timeout: 0.2
